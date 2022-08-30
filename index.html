@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <title>Test Project</title>
+  <!-- Required meta tags -->
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+    integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous" />
+
+  <style>
+    body {
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      flex-wrap: nowrap;
+      justify-content: center;
+      align-items: center;
+      align-content: flex-start;
+      overflow: auto;
+      flex-direction: column;
+    }
+
+    .btn {
+      margin: 10px;
+    }
+  </style>
+</head>
+
+<body>
+  <a class="btn btn-primary btn-lg" id="getVoucher" href="#" role="button"> get Voucher </a>
+  <a class="btn btn-primary btn-lg" id="redeem" href="#" role="button"> Redeem </a>
+
+
+  <script type="module">
+
+    import { ethers } from "ethers";
+    import config from "./config";
+    import { NFT } from "./NFT";
+
+    async function init(provider) {
+      let { chainId } = await provider.getNetwork();
+      let NFTContractAddress;
+      if (chainId == 4) {
+        NFTContractAddress = config.rinkeby.NFTContractAddress;
+      } else {
+        throw new Error("Unsupported network: " + chainId);
+      }
+      console.log(NFTContractAddress);
+      console.log(provider);
+      const nft = new NFT(provider, NFTContractAddress);
+      console.log(nft)
+      return nft;
+    }
+
+    window.onload = async () => {
+      await window.ethereum.enable();
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
+      const nft = await init(provider);
+
+      document.getElementById("getVoucher").addEventListener("click", async () => {
+        var http = new XMLHttpRequest();
+        var useraddress = "0x1C4A0724DC884076B9196FFf7606623409613Adf";
+        var noOfNFTs = "2";
+        var url = 'http://localhost:3000/minting-vouchers?address=' + useraddress + '&noOfNFTs=' + noOfNFTs;
+        http.open('GET', url, true);
+
+        //Send the proper header information along with the request
+        http.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+
+        http.onreadystatechange = function () {//Call a function when the state changes.
+          if (http.readyState == 4 && http.status == 200) {
+            const voucher = JSON.parse(http.response).data;
+            console.log(voucher);
+            localStorage.setItem("latestvoucher", JSON.stringify(voucher));
+          }
+        }
+        http.send();
+
+      });
+
+      document.getElementById("redeem").addEventListener("click", async () => {
+        try {
+          const voucher = JSON.parse(localStorage.getItem("latestvoucher"));
+          console.log(voucher);
+          await nft.redeemVoucher(voucher);
+        } catch (err) {
+          console.log(err);
+        }
+      });
+
+      
+    };
+
+  </script>
+</body>
+
+</html>
