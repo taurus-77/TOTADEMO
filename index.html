@@ -44,15 +44,13 @@
     async function init(provider) {
       let { chainId } = await provider.getNetwork();
       let NFTContractAddress;
-      if (chainId == 4) {
-        NFTContractAddress = config.rinkeby.NFTContractAddress;
+      if (chainId == 5) {
+        NFTContractAddress = config.goerli.NFTContractAddress;
       } else {
         throw new Error("Unsupported network: " + chainId);
       }
-      console.log(NFTContractAddress);
-      console.log(provider);
+
       const nft = new NFT(provider, NFTContractAddress);
-      console.log(nft)
       return nft;
     }
 
@@ -60,11 +58,11 @@
       await window.ethereum.enable();
       const provider = new ethers.providers.Web3Provider(window.ethereum);
       const nft = await init(provider);
+      var noOfNFTs = "2";
 
       document.getElementById("getVoucher").addEventListener("click", async () => {
         var http = new XMLHttpRequest();
         var useraddress = "0x1C4A0724DC884076B9196FFf7606623409613Adf";
-        var noOfNFTs = "2";
         var url = 'http://localhost:3000/minting-vouchers?address=' + useraddress + '&noOfNFTs=' + noOfNFTs;
         http.open('GET', url, true);
 
@@ -86,13 +84,13 @@
         try {
           const voucher = JSON.parse(localStorage.getItem("latestvoucher"));
           console.log(voucher);
-          await nft.redeemVoucher(voucher);
+          await nft.redeemVoucher(voucher, noOfNFTs);
         } catch (err) {
           console.log(err);
         }
       });
 
-      
+
     };
 
   </script>

@@ -20,6 +20,7 @@
         "parcel": "^2.0.0"
     },
     "devDependencies": {
+        "@parcel/transformer-html": "^2.7.0",
         "@types/node": "^16.11.4"
     }
 }

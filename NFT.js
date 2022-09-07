@@ -20,11 +20,14 @@ class NFT {
      *
      * @param {NFTVoucher} voucher The signed NFT voucher that can be redeemed by an ethereum address.
      */
-    async redeemVoucher(voucher) {
+    async redeemVoucher(voucher, noOfNFTs) {
         const NFTContract = this.NFTContract;
         const signerAddress = await this.signer.getAddress();
+
+        let perNFTPrice = 0.001 * noOfNFTs;
+
         try {
-            console.log(await NFTContract.redeem(voucher));
+            console.log(await NFTContract.redeem(voucher, { value: ethers.utils.parseEther(perNFTPrice.toString()) }));
             NFTContract.on("Transfer", (from, to, tokenId) => {
                 if (from != ethers.constants.AddressZero)
                     console.log("From : ", from, "To :", to, "Token ID :", tokenId.toString());
