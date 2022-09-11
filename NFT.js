@@ -27,11 +27,34 @@ class NFT {
         let perNFTPrice = 0.001 * noOfNFTs;
 
         try {
-            console.log(await NFTContract.redeem(voucher, { value: ethers.utils.parseEther(perNFTPrice.toString()) }));
+            await NFTContract.redeem(voucher, { value: ethers.utils.parseEther(perNFTPrice.toString()) });
             NFTContract.on("Transfer", (from, to, tokenId) => {
                 if (from != ethers.constants.AddressZero)
                     console.log("From : ", from, "To :", to, "Token ID :", tokenId.toString());
             });
+        } catch (err) {
+            return Promise.reject(err);
+        }
+    }
+
+
+    async airDrop(data) {
+        const NFTContract = this.NFTContract;
+
+        let addresses = [];
+        let ids = [];
+        let uris = [];
+
+        for (let i = 0; i < data.length; i++) {
+            ids.push(data[i].map(data => data.tokenId));
+            uris.push(data[i].map(data => data.uri));
+            addresses.push(data[i][0].address)
+        }
+
+        try {
+            await NFTContract.airdrop(addresses, ids, uris);
+
+
         } catch (err) {
             return Promise.reject(err);
         }

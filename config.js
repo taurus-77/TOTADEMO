@@ -7,6 +7,6 @@ module.exports = {
         rpc_url: `https://goerli.infura.io/v3/${process.env.INFURA_KEY}`,
         mnemonic: process.env.MNEMONIC,
         priv_key: process.env.PRIVATE_KEY,
-        NFTContractAddress: "0x485e4bFccf3c3230883Dccbef9C9DC3A8fbb1f1D",
+        NFTContractAddress: "0xEB81a4390a986fe3962d1C1432739753D2312129",
     }
 };

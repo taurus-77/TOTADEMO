@@ -33,6 +33,8 @@
 <body>
   <a class="btn btn-primary btn-lg" id="getVoucher" href="#" role="button"> get Voucher </a>
   <a class="btn btn-primary btn-lg" id="redeem" href="#" role="button"> Redeem </a>
+  <a class="btn btn-primary btn-lg" id="getAirdrop" href="#" role="button"> Get Air Drop </a>
+  <a class="btn btn-primary btn-lg" id="sendAirdrop" href="#" role="button"> send </a>
 
 
   <script type="module">
@@ -85,6 +87,45 @@
           const voucher = JSON.parse(localStorage.getItem("latestvoucher"));
           console.log(voucher);
           await nft.redeemVoucher(voucher, noOfNFTs);
+        } catch (err) {
+          console.log(err);
+        }
+      });
+
+
+      document.getElementById("getAirdrop").addEventListener("click", async () => {
+        var http = new XMLHttpRequest();
+
+        let address1 = "0xCde17847B95F158A6FE152FA7Ca9F0FbFC55BADb";
+        let NFTcount1 = "2";
+
+        let address2 = "0x58B29C13666f07f4c8A7Ece208290f65983948A5";
+        let NFTcount2 = "1";
+
+
+        var url = "http://localhost:3000/minting-vouchers/get-airdrop-uris?addresses=" + address1 + "&addresses=" + address2 + "&noOfNFTs=" + NFTcount1 + "&noOfNFTs=" + NFTcount2;
+
+        http.open('GET', url, true);
+
+        //Send the proper header information along with the request
+        http.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+
+        http.onreadystatechange = function () {//Call a function when the state changes.
+          if (http.readyState == 4 && http.status == 200) {
+            const data = JSON.parse(http.response).data;
+            console.log(data);
+            localStorage.setItem("airdropArray", JSON.stringify(data));
+          }
+        }
+        http.send();
+
+      });
+
+      document.getElementById("sendAirdrop").addEventListener("click", async () => {
+        try {
+          const data = JSON.parse(localStorage.getItem("airdropArray"));
+          console.log(data);
+          await nft.airDrop(data);
         } catch (err) {
           console.log(err);
         }
